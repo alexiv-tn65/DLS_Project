@@ -25,6 +25,14 @@ import aiogram.utils.markdown as md
 logging.basicConfig(level=logging.INFO)
 
 
+
+
+
+# МОДЕЛЬ
+from style_transfer.model import VGGStyleTransfer
+
+
+
 # bot_token = getenv("BOT_TOKEN")
 # if not bot_token:
 #     exit("Error: no token provided")
@@ -52,6 +60,18 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 # Отлично! Теперь мы можем записывать данные пользователя в оперативную память.
 
+
+
+
+
+
+# задаём соединение с Redis по умолчанию
+from rq import Queue
+import redis
+
+conn = redis.from_url(redis_url)
+#Подключаемся к базе данных Redis
+redis_queue = Queue(connection=conn, default_timeout=600)
 
 # Перед тем как создать какое-либо состояние, нам нужно создать класс, где мы поочередно опишем все states чтобы потом без проблем переключаться между ними.
 # States
@@ -164,6 +184,11 @@ async def process_photo_style(message: types.Message, state: FSMContext):
         photo_style = style_transfer_model.load_image(f'./photos/{message.chat.id}_style.jpg')
         result_path = f'./photos/{message.chat.id}_result.jpg'
 
+        # q.enqueue_call(func=count_words_at_url,
+        #        args=('http://nvie.com',),
+               # timeout=30)
+        
+        # enqueue - поставить в очередь
         job = redis_queue.enqueue_call(
             func=style_transfer_model.run_style_transfer,
             args=(photo_main, style_photo, result_path),
