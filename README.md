@@ -1,15 +1,15 @@
-# MIPT DLSchool final project (advanced track).
+# MIPT DLSchool final project (advanced track) #
 
-# DLS_Project
+## Bot  Neural Style Transfer
 
-# Bot  Neural Style Transfer
+### Installation
 
-## Installation
+#### For use with docker
 
-### For use with docker
-
-Paste your bot token into the dockerfile:
+Paste your bot token into the **dockerfile**:
 ENV TELEGRAM_BOT_TOKEN = 'your telegram bot token'
 
 docker build . -t my_bot_app
+
+docker run -d my_bot_app
 
