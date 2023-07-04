@@ -1,12 +1,30 @@
+import os
+import logging
+
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
-import os
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+
+logging.basicConfig(level=logging.INFO)
+
+
+
+# TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
+
+storage = MemoryStorage()
+dp = Dispatcher(bot, storage=storage)
+
+class FotoState(StatesGroup):
+    photo_main = State()
+    photo_style = State()
+
 
 
 @dp.message_handler(commands=['start', 'help'])
