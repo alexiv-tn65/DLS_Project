@@ -26,19 +26,45 @@ class FotoState(StatesGroup):
     photo_style = State()
 
 
-
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
-    await message.reply('Я бот. Приятно познакомиться')
+    await message.reply('Hello, I\'m a bot. I can transfer the style of one picture to another.\nTo\
+        start, enter the command "/transfer".\nTo abort execution and start again, enter the\
+        command "/abort".')
 
+@dp.message_handler(commands=['transfer'])
+async def style_transfer_begin(message: types.Message):
+    await FotoState.photo_main.set()
+    await bot.send_message(message.chat.id, "Please, send a photo.")
+
+
+@dp.message_handler(state='*', commands='abort')
+@dp.message_handler(Text(equals='abort', ignore_case=True), state='*')
+async def cancel_handler(message: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+
+    await state.finish()
+    await message.reply('Canceled, you can start again using the command "/transfer".',
+                        reply_markup=types.ReplyKeyboardRemove())
+
+
+@dp.message_handler(state=FotoState.photo_main, content_types=['photo'])
+async def process_photo_main(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['photo_main'] = message.photo[-1]
+
+    await FotoState.next()
+    await bot.send_message(message.chat.id, "Now send style photo.")
 
 
 @dp.message_handler(content_types=['text'])
 async def get_text_messages(message: types.Message):
-   if message.text.lower() == 'привет':
-       await message.answer('Привет!')
+   if message.text.lower() == 'Hi':
+       await message.answer('Hi!')
    else:
-       await message.answer('Не понимаю, что это значит.')
+       await message.answer('I don\'t understand what it means.')
 
 
 
