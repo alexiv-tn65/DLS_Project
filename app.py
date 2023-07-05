@@ -7,12 +7,9 @@ from aiogram.utils import executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
-
-
-
+from aiogram.dispatcher import FSMContext
 
 logging.basicConfig(level=logging.INFO)
-
 
 
 # TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
@@ -67,6 +64,7 @@ async def error_photo_main(message: types.Message):
 
 @dp.message_handler(state=FotoState.photo_style, content_types=['photo'])
 async def process_photo_style(message: types.Message, state: FSMContext):
+    await message.reply("The photos has been uploaded, I'm starting to process them.")
     pass
 
 @dp.message_handler(state=FotoState.photo_style)
