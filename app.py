@@ -64,7 +64,7 @@ async def error_photo_main(message: types.Message):
 
 @dp.message_handler(state=FotoState.photo_style, content_types=['photo'])
 async def process_photo_style(message: types.Message, state: FSMContext):
-    await message.reply("The photos has been uploaded, I'm starting to process them.")
+    await message.reply("Photos have been uploaded, I'm starting to process them.")
     pass
 
 @dp.message_handler(state=FotoState.photo_style)
