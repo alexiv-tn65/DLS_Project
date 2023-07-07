@@ -45,17 +45,17 @@ class VGG(nn.Module):
         self.cnn = models.vgg19(pretrained=True).features.eval()
 
 
-    def get_style_model_and_losses(self, cnn, normalization_mean, normalization_std,
-                                   style_img, content_img,
-                                   content_layers=content_layers_default,
-                                   style_layers=style_layers_default):
+    def get_style_model_and_losses(self, style_img, content_img):
 
         # desired depth layers to compute style/content losses :
         content_layers = ['conv_4']
         style_layers = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 
+        cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406])
+        cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225])
+
         # normalization module
-        normalization = Normalization(normalization_mean, normalization_std)
+        normalization = Normalization(cnn_normalization_mean, cnn_normalization_std)
 
         # just in order to have an iterable access to or list of content/style
         # losses
@@ -67,7 +67,7 @@ class VGG(nn.Module):
         model = nn.Sequential(normalization)
 
         i = 0  # increment every time we see a conv
-        for layer in cnn.children():
+        for layer in self.cnn.children():
             if isinstance(layer, nn.Conv2d):
                 i += 1
                 name = 'conv_{}'.format(i)
@@ -109,13 +109,12 @@ class VGG(nn.Module):
 
         return model, style_losses, content_losses
 
-    def run_style_transfer(self, cnn, normalization_mean, normalization_std,
-                           content_img, style_img, input_img, num_steps=300,
-                           style_weight=1000000, content_weight=1):
+    def run_style_transfer(self, content_img, style_img, input_img, num_steps=300, 
+        style_weight=1000000, content_weight=1):
+    
         """Run the style transfer."""
         print('Building the style transfer model..')
-        model, style_losses, content_losses = get_style_model_and_losses(cnn,
-            normalization_mean, normalization_std, style_img, content_img)
+        model, style_losses, content_losses = get_style_model_and_losses(style_img, content_img)
 
         # We want to optimize the input and not the model parameters so we
         # update all the requires_grad fields accordingly
