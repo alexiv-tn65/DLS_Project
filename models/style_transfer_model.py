@@ -20,21 +20,13 @@ class VGG(nn.Module):
         super().__init__()
 
         if device is None:
-            # self.device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             torch.set_default_device(self.device)
         else:
             self.device: str = device
 
-        # self.image_size: int = 512 if self.device == 'cuda' else 128
-
         # desired size of the output image
         self.imsize = 512 if torch.cuda.is_available() else 128  # use small size if no GPU
-
-        # self.image_transforms = transforms.Compose([
-        #     transforms.Resize((self.image_size, self.image_size)),
-        #     transforms.ToTensor()
-        # ])
 
         self.loader = transforms.Compose([
         transforms.Resize(self.imsize),  # scale imported image
@@ -42,7 +34,8 @@ class VGG(nn.Module):
 
 
         # self.vgg = models.vgg19(weights='VGG19_Weights.DEFAULT').features.to(self.device).eval()
-        self.cnn = models.vgg19(pretrained=True).features.eval()
+        self.cnn = models.vgg19(pretrained=True).features.to(self.device).eval()
+        # self.cnn = models.vgg19(pretrained=True).features.eval()
 
 
     def get_style_model_and_losses(self, style_img, content_img):
@@ -111,7 +104,7 @@ class VGG(nn.Module):
 
     def run_style_transfer(self, content_img, style_img, input_img, num_steps=300, 
         style_weight=1000000, content_weight=1):
-    
+
         """Run the style transfer."""
         print('Building the style transfer model..')
         model, style_losses, content_losses = get_style_model_and_losses(style_img, content_img)
@@ -172,5 +165,5 @@ class VGG(nn.Module):
         image = Image.open(image_name)
         # fake batch dimension required to fit network's input dimensions
         image = loader(image).unsqueeze(0)
-        return image.to(device, torch.float)
+        return image.to(self.device, torch.float)
 
