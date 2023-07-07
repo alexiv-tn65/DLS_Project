@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 # TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
-TOKEN = '5806405592:AAF2kMEn7hBQb0iEjZ1Mom4xnVkulXrYOJo'
+TOKEN = ''
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
@@ -57,10 +57,10 @@ async def process_photo_main(message: types.Message, state: FSMContext):
     await FotoState.next()
     await bot.send_message(message.chat.id, "Now send style photo.")
 
-
 @dp.message_handler(state=FotoState.photo_main)
 async def error_photo_main(message: types.Message):
     await message.reply("Error. I need a photo.")
+
 
 @dp.message_handler(state=FotoState.photo_style, content_types=['photo'])
 async def process_photo_style(message: types.Message, state: FSMContext):
@@ -70,6 +70,8 @@ async def process_photo_style(message: types.Message, state: FSMContext):
 @dp.message_handler(state=FotoState.photo_style)
 async def error_photo_style(message: types.Message):
     await message.reply("Error. I need a style photo.")
+
+
 
 @dp.message_handler(content_types=['text'])
 async def get_text_messages(message: types.Message):
