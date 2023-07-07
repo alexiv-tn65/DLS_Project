@@ -4,14 +4,13 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 from PIL import Image
-import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 import torchvision.transforms as transforms
 import torchvision.models as models
+from torchvision.utils import save_image
 
-# import copy
-
-from models.loss_functions import StyleLoss, ContentLoss,
+from models.loss_functions import StyleLoss, ContentLoss
 from models.image_preparation import Normalization
 
 
@@ -27,16 +26,22 @@ class VGG(nn.Module):
 
         # desired size of the output image
         self.imsize = 512 if torch.cuda.is_available() else 128  # use small size if no GPU
+        # self.imsize = 512 if torch.cuda.is_available() else 256  # use small size if no GPU
 
         self.loader = transforms.Compose([
-        transforms.Resize(self.imsize),  # scale imported image
+        transforms.Resize((self.imsize,self.imsize)),  # scale imported image
         transforms.ToTensor()])  # transform it into a torch tensor
 
 
         # self.vgg = models.vgg19(weights='VGG19_Weights.DEFAULT').features.to(self.device).eval()
         self.cnn = models.vgg19(pretrained=True).features.to(self.device).eval()
+        # self.cnn = models.vgg19(weights='VGG19_Weights.DEFAULT').features.to(self.device).eval()
         # self.cnn = models.vgg19(pretrained=True).features.eval()
 
+    def get_input_optimizer(self, input_img):
+        # this line to show that input is a parameter that requires a gradient
+        optimizer = optim.LBFGS([input_img])
+        return optimizer
 
     def get_style_model_and_losses(self, style_img, content_img):
 
@@ -102,12 +107,14 @@ class VGG(nn.Module):
 
         return model, style_losses, content_losses
 
-    def run_style_transfer(self, content_img, style_img, input_img, num_steps=300, 
+    def run_style_transfer(self, content_img, style_img, result_path, num_steps=300, 
         style_weight=1000000, content_weight=1):
 
         """Run the style transfer."""
-        print('Building the style transfer model..')
-        model, style_losses, content_losses = get_style_model_and_losses(style_img, content_img)
+        # print('Building the style transfer model..')
+        model, style_losses, content_losses = self.get_style_model_and_losses(style_img, content_img)
+
+        input_img = content_img
 
         # We want to optimize the input and not the model parameters so we
         # update all the requires_grad fields accordingly
@@ -117,11 +124,12 @@ class VGG(nn.Module):
         model.eval()
         model.requires_grad_(False)
 
-        optimizer = get_input_optimizer(input_img)
+        optimizer = self.get_input_optimizer(input_img)
 
         print('Optimizing..')
-        run = [0]
-        while run[0] <= num_steps:
+        # run = 0
+        # while run <= num_steps:
+        for _ in tqdm(range(num_steps)):
 
             def closure():
                 # correct the values of updated input image
@@ -144,12 +152,12 @@ class VGG(nn.Module):
                 loss = style_score + content_score
                 loss.backward()
 
-                run[0] += 1
-                if run[0] % 50 == 0:
-                    print("run {}:".format(run))
-                    print('Style Loss : {:4f} Content Loss: {:4f}'.format(
-                        style_score.item(), content_score.item()))
-                    print()
+                # run += 1
+                # if run % 50 == 0:
+                #     print("run {}:".format(run))
+                #     print('Style Loss : {:4f} Content Loss: {:4f}'.format(
+                #         style_score.item(), content_score.item()))
+                #     print()
 
                 return style_score + content_score
 
@@ -159,11 +167,14 @@ class VGG(nn.Module):
         with torch.no_grad():
             input_img.clamp_(0, 1)
 
+        if result_path:
+            save_image(input_img[0], result_path)
+
         return input_img
 
     def image_loader(self, image_path):
-        image = Image.open(image_name)
+        image = Image.open(image_path)
         # fake batch dimension required to fit network's input dimensions
-        image = loader(image).unsqueeze(0)
+        image = self.loader(image).unsqueeze(0)
         return image.to(self.device, torch.float)
 
