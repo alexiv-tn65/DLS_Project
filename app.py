@@ -33,10 +33,10 @@ class FotoState(StatesGroup):
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
     await message.reply('Hello, I\'m a bot. I can transfer the style of one picture to another.\nTo\
-        start, enter the command "/transfer".\nTo abort execution and start again, enter the\
+        start, enter the command "/transfer_style".\nTo abort execution and start again, enter the\
         command "/abort".')
 
-@dp.message_handler(commands=['transfer'])
+@dp.message_handler(commands=['transfer_style'])
 async def style_transfer_begin(message: types.Message):
     await FotoState.photo_main.set()
     await bot.send_message(message.chat.id, "Please, send a photo.")
@@ -50,7 +50,7 @@ async def abort_handler(message: types.Message, state: FSMContext):
         return
 
     await state.finish()
-    await message.reply('Canceled, you can start again using the command "/transfer".',
+    await message.reply('Canceled, you can start again using the command "/transfer_style".',
                         reply_markup=types.ReplyKeyboardRemove())
 
 
