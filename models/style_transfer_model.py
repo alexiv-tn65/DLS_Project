@@ -31,7 +31,8 @@ class StyleTransferNNet(nn.Module):
         transforms.Resize((self.imsize,self.imsize)),  # scale imported image
         transforms.ToTensor()])  # transform it into a torch tensor
 
-        self.cnn = models.vgg19(pretrained=True).features.to(self.device).eval()
+        # self.cnn = models.vgg19(pretrained=True).features.to(self.device).eval()
+        self.cnn = models.vgg19(weights='VGG19_Weights.DEFAULT').features.to(self.device).eval()
 
     def get_input_optimizer(self, input_img):
         # this line to show that input is a parameter that requires a gradient
