@@ -14,7 +14,7 @@ from models.style_transfer_model import StyleTransferNNet
 logging.basicConfig(level=logging.INFO)
 
 
-# TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
