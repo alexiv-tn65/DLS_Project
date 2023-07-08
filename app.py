@@ -9,23 +9,21 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 
-from models.style_transfer_model import VGG
+from models.style_transfer_model import StyleTransferNNet
 
 logging.basicConfig(level=logging.INFO)
 
 
 # TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
-TOKEN = ''
+
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
-
-import torch
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-st_model = VGG(device)
+device = None
+st_model = StyleTransferNNet(device)
 
 class FotoState(StatesGroup):
     photo_main = State()
