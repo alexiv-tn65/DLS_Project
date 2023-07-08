@@ -1,4 +1,5 @@
-FROM python:3.8
+FROM python:3.8.2-alpine
+# FROM python:3.8
 
 # ENV - creates an environment variable
 ENV TELEGRAM_BOT_TOKEN=''
