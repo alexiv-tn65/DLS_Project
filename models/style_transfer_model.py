@@ -14,7 +14,7 @@ from models.loss_functions import StyleLoss, ContentLoss
 from models.image_preparation import Normalization
 
 
-class VGG(nn.Module):
+class StyleTransferNNet(nn.Module):
     def __init__(self, device):
         super().__init__()
 
@@ -26,17 +26,12 @@ class VGG(nn.Module):
 
         # desired size of the output image
         self.imsize = 512 if torch.cuda.is_available() else 128  # use small size if no GPU
-        # self.imsize = 512 if torch.cuda.is_available() else 256  # use small size if no GPU
 
         self.loader = transforms.Compose([
         transforms.Resize((self.imsize,self.imsize)),  # scale imported image
         transforms.ToTensor()])  # transform it into a torch tensor
 
-
-        # self.vgg = models.vgg19(weights='VGG19_Weights.DEFAULT').features.to(self.device).eval()
         self.cnn = models.vgg19(pretrained=True).features.to(self.device).eval()
-        # self.cnn = models.vgg19(weights='VGG19_Weights.DEFAULT').features.to(self.device).eval()
-        # self.cnn = models.vgg19(pretrained=True).features.eval()
 
     def get_input_optimizer(self, input_img):
         # this line to show that input is a parameter that requires a gradient
@@ -126,9 +121,7 @@ class VGG(nn.Module):
 
         optimizer = self.get_input_optimizer(input_img)
 
-        print('Optimizing..')
-        # run = 0
-        # while run <= num_steps:
+        # print('Optimizing..')
         for _ in tqdm(range(num_steps)):
 
             def closure():
@@ -151,13 +144,6 @@ class VGG(nn.Module):
 
                 loss = style_score + content_score
                 loss.backward()
-
-                # run += 1
-                # if run % 50 == 0:
-                #     print("run {}:".format(run))
-                #     print('Style Loss : {:4f} Content Loss: {:4f}'.format(
-                #         style_score.item(), content_score.item()))
-                #     print()
 
                 return style_score + content_score
 
