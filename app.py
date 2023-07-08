@@ -9,6 +9,8 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 
+from models.style_transfer_model import VGG
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -19,6 +21,11 @@ dp = Dispatcher(bot)
 
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
+
+
+import torch
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+st_model = VGG(device)
 
 class FotoState(StatesGroup):
     photo_main = State()
@@ -65,7 +72,17 @@ async def error_photo_main(message: types.Message):
 @dp.message_handler(state=FotoState.photo_style, content_types=['photo'])
 async def process_photo_style(message: types.Message, state: FSMContext):
     await message.reply("Photos have been uploaded, I'm starting to process them.")
-    pass
+    async with state.proxy() as data:
+        data['photo_style'] = message.photo[-1]
+        await data['photo_main'].download(f'./photos/{message.chat.id}_main.jpg')
+        await data['photo_style'].download(f'./photos/{message.chat.id}_style.jpg')
+
+        photo_main = st_model.image_loader(f'./photos/{message.chat.id}_main.jpg')
+        photo_style = st_model.image_loader(f'./photos/{message.chat.id}_style.jpg')
+        result_path = f'./photos/{message.chat.id}_result.jpg'
+
+        st_model.run_style_transfer(photo_main, photo_style, result_path)
+
 
 @dp.message_handler(state=FotoState.photo_style)
 async def error_photo_style(message: types.Message):
