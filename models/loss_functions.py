@@ -14,7 +14,7 @@ class ContentLoss(nn.Module):
         self.target = target.detach()
 
     def forward(self, input):
-        self.loss = F.mse_loss(input, self.target)
+        self.loss = nn.functional.mse_loss(input, self.target)
         return input
 
 
@@ -26,5 +26,5 @@ class StyleLoss(nn.Module):
 
     def forward(self, input):
         G = gram_matrix(input)
-        self.loss = F.mse_loss(G, self.target)
+        self.loss = nn.functional.mse_loss(G, self.target)
         return input
