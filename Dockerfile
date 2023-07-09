@@ -1,5 +1,5 @@
 FROM python:3.8-slim
-# FROM python:3.8
+# FROM python:3.8 # alternative
 
 # ENV - creates an environment variable
 ENV TELEGRAM_BOT_TOKEN=''
@@ -17,4 +17,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # CMD - Specifies the command and arguments to execute inside the container
 # run app
-CMD ["python", "app.py"]
+# CMD ["python", "app.py"] # fot testing on local machine
+EXPOSE 8000
+RUN chmod +x bot.sh
+CMD ["./bot.sh"]
