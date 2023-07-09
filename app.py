@@ -19,7 +19,9 @@ from worker import connect
 logging.basicConfig(level=logging.INFO)
 
 
-TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TOKEN = os.getenv('TG_BOT_TOKEN')
+
+
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
@@ -42,7 +44,7 @@ class FotoState(StatesGroup):
 async def send_welcome(message: types.Message):
     await message.reply('Hello, I\'m a bot. I can transfer the style of one picture to another.\nTo\
         start, enter the command "/transfer_style".\nTo abort execution and start again, enter the\
-        command "/abort".')
+        command "/abort".  To get result: "/get_result".')
 
 @dp.message_handler(commands=['transfer_style'])
 async def style_transfer_begin(message: types.Message):
@@ -113,7 +115,6 @@ async def process_photo_style(message: types.Message, state: FSMContext):
 @dp.message_handler(state=FotoState.photo_style)
 async def error_photo_style(message: types.Message):
     await message.reply("Error. I need a style photo.")
-
 
 
 @dp.message_handler(commands='get_result', state=FotoState.job_id)
