@@ -115,7 +115,6 @@ async def error_photo_style(message: types.Message):
     await message.reply("Error. I need a style photo.")
 
 
-
 @dp.message_handler(commands='get_result', state=FotoState.job_id)
 async def get_info_result(message: types.Message, state: FSMContext):
     try:
