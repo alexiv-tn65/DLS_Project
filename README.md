@@ -6,6 +6,11 @@
 
 ### Installation
 
+#### For use with docker-compose
+
+- docker-compose build
+- docker-compose up
+
 #### For use with docker
 
 - Install Redis
@@ -18,11 +23,6 @@ docker build . -t my_bot_app
 
 - run docker image:
 docker run -d my_bot_app
-
-#### For use with docker-compose
-
-- docker-compose build
-- docker-compose up
 
 #### For use without docker
 
