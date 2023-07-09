@@ -43,3 +43,4 @@ triton==2.0.0
 typing_extensions==4.7.1
 urllib3==2.0.3
 yarl==1.9.2
+rq-win @ git+https://github.com/michaelbrooks/rq-win.git@c6e65e38f8a6ca99a0c8e0dd6fe35f9b92837cca
