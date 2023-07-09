@@ -10,11 +10,12 @@ import signal
 
 listen = ["default"]
 
-# REDIS_ENDPOINT = os.getenv("REDIS_ENDPOINT", default="localhost")
-# REDIS_PORT = os.getenv("REDIS_PORT", default="6379")
+REDIS_ENDPOINT = os.getenv("REDIS_ENDPOINT", default="localhost")
+REDIS_PORT = os.getenv("REDIS_PORT", default="6379")
 
-REDIS_ENDPOINT = "localhost"
-REDIS_PORT = "6379"
+# for local testing
+# REDIS_ENDPOINT = "localhost"
+# REDIS_PORT = "6379"
 
 redis_url = "redis://" + REDIS_ENDPOINT + ":" + REDIS_PORT
 

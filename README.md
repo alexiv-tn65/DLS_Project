@@ -8,6 +8,8 @@
 
 #### For use with docker
 
+- Install Redis
+
 - Paste your bot token into the **dockerfile**:
 ENV TELEGRAM_BOT_TOKEN = 'your telegram bot token'
 
@@ -17,6 +19,24 @@ docker build . -t my_bot_app
 - run docker image:
 docker run -d my_bot_app
 
+#### For use with docker-compose
+
+- docker-compose build
+- docker-compose up
+
+#### For use without docker
+
+- Install packages
+pip install -r requirements.txt
+
+- Install Redis
+
+- Set environment variables: TG_BOT_TOKEN,
+REDIS_ENDPOINT, REDIS_PORT
+
+- Run worker.py and app.py
+python -u worker.py
+python -u app.py 
 
 #### Example
 

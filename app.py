@@ -19,7 +19,7 @@ from worker import connect
 logging.basicConfig(level=logging.INFO)
 
 
-TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TOKEN = os.getenv('TG_BOT_TOKEN')
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
