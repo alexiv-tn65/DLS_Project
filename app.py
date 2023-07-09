@@ -1,5 +1,7 @@
 import os
 import logging
+from rq import Queue
+from rq.job import Job
 
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
@@ -8,8 +10,11 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
+from aiogram.types import ParseMode
+import aiogram.utils.markdown as md
 
 from models.style_transfer_model import StyleTransferNNet
+from worker import connect
 
 logging.basicConfig(level=logging.INFO)
 
@@ -18,6 +23,8 @@ TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
+
+red_queue = Queue(connection=connect, default_timeout=1000)
 
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
@@ -28,6 +35,7 @@ st_model = StyleTransferNNet(device)
 class FotoState(StatesGroup):
     photo_main = State()
     photo_style = State()
+    job_id = State()
 
 
 @dp.message_handler(commands=['start', 'help'])
@@ -79,13 +87,48 @@ async def process_photo_style(message: types.Message, state: FSMContext):
         photo_style = st_model.image_loader(f'./photos/{message.chat.id}_style.jpg')
         result_path = f'./photos/{message.chat.id}_result.jpg'
 
-        st_model.run_style_transfer(photo_main, photo_style, result_path)
+        red_job = red_queue.enqueue_call(
+            func=st_model.run_style_transfer,
+            args=(photo_main, photo_style, result_path),
+            result_ttl=1000,
+            ttl=1000,
+            failure_ttl=1000
+        )
+
+        data['job_id'] = red_job.get_id()
+        await FotoState.next()
+
+        # st_model.run_style_transfer(photo_main, photo_style, result_path)
+
+    await bot.send_message(
+        message.chat.id,
+        md.text(
+            md.text('Starting to prepare photo.'),
+            sep='\n',
+        ),
+        parse_mode=ParseMode.MARKDOWN,
+    )
 
 
 @dp.message_handler(state=FotoState.photo_style)
 async def error_photo_style(message: types.Message):
     await message.reply("Error. I need a style photo.")
 
+
+
+@dp.message_handler(commands='get_result', state=FotoState.job_id)
+async def get_info_result(message: types.Message, state: FSMContext):
+    try:
+        async with state.proxy() as data:
+            job = Job.fetch(data['job_id'], connection=connect)
+            if job.is_finished:
+                resulting_image = open(f'./photos/{message.chat.id}_result.jpg', 'rb')
+                await bot.send_photo(message.chat.id, resulting_image, "Here is your photo")
+                await state.finish()
+            else:
+                await bot.send_message(message.chat.id, "Photo not ready please wait")
+    except Exception as e:
+        pass
 
 
 @dp.message_handler(content_types=['text'])

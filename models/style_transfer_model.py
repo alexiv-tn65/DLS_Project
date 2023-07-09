@@ -26,13 +26,15 @@ class StyleTransferNNet(nn.Module):
 
         # desired size of the output image
         self.imsize = 512 if torch.cuda.is_available() else 128  # use small size if no GPU
+        # self.imsize = 512 if torch.cuda.is_available() else 256  # use small size if no GPU
 
         self.loader = transforms.Compose([
         transforms.Resize((self.imsize,self.imsize)),  # scale imported image
         transforms.ToTensor()])  # transform it into a torch tensor
 
         # self.cnn = models.vgg19(pretrained=True).features.to(self.device).eval()
-        self.cnn = models.vgg19(weights='VGG19_Weights.DEFAULT').features.to(self.device).eval()
+        # self.cnn = models.vgg19(weights='VGG19_Weights.DEFAULT').features.to(self.device).eval()
+        self.cnn = models.vgg19(weights='VGG19_Weights.IMAGENET1K_V1').features.to(self.device).eval()
 
     def get_input_optimizer(self, input_img):
         # this line to show that input is a parameter that requires a gradient
@@ -103,7 +105,7 @@ class StyleTransferNNet(nn.Module):
 
         return model, style_losses, content_losses
 
-    def run_style_transfer(self, content_img, style_img, result_path, num_steps=300, 
+    def run_style_transfer(self, content_img, style_img, result_path, num_steps=100, 
         style_weight=1000000, content_weight=1):
 
         """Run the style transfer."""
