@@ -2,6 +2,8 @@
 
 ## Bot  Neural Style Transfer
 
+## The neural network model is based on the code from the official pytorch tutorial: https://pytorch.org/tutorials/advanced/neural_style_tutorial.html
+
 ### Installation
 
 #### For use with docker
@@ -22,4 +24,3 @@ docker run -d my_bot_app
 |----------|----------------|------------|
 | <img src="https://github.com/alexiv-tn65/DLS_Project/blob/d2d46bd56c682f13aa121f8474dc24c6acde2362/examples/1/335034699_main.jpg" width="128" height="128"> | <img src="https://github.com/alexiv-tn65/DLS_Project/blob/d2d46bd56c682f13aa121f8474dc24c6acde2362/examples/1/335034699_result.jpg" width="128" height="128">   | <img src="https://github.com/alexiv-tn65/DLS_Project/blob/d2d46bd56c682f13aa121f8474dc24c6acde2362/examples/1/335034699_style.jpg" width="128" height="128">  |
 | <img src="https://github.com/alexiv-tn65/DLS_Project/blob/5646c5706ef6df26768a3b372ec67b3e77690a0c/examples/2/335034699_main.jpg" width="128" height="128"> | <img src="https://github.com/alexiv-tn65/DLS_Project/blob/5646c5706ef6df26768a3b372ec67b3e77690a0c/examples/2/335034699_result.jpg" width="128" height="128">   | <img src="https://github.com/alexiv-tn65/DLS_Project/blob/5646c5706ef6df26768a3b372ec67b3e77690a0c/examples/2/335034699_style.jpg" width="128" height="128">  |
-| <img src="" width="128" height="128"> | <img src="" width="128" height="128">   | <img src="" width="128" height="128">  |
